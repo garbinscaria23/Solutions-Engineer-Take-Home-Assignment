@@ -43,7 +43,7 @@ endpoints = [
             "timestamp": "2026-01-08T12:11:58.085567+00:00",
             "received_at": "2026-07-19T17:37:46.429153+05:30"
         },
-        "curl": "curl -X POST http://localhost:8000/events \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"event_id\": \"b768e3a7-9eb3-4603-b21c-a54cc95661bc\",\n    \"event_type\": \"payment_initiated\",\n    \"transaction_id\": \"2f86e94c-239c-4302-9874-75f28e3474ee\",\n    \"merchant_id\": \"merchant_2\",\n    \"merchant_name\": \"FreshBasket\",\n    \"amount\": 15248.29,\n    \"currency\": \"INR\",\n    \"timestamp\": \"2026-01-08T12:11:58.085567+00:00\"\n  }'"
+        "curl": "curl -X POST http://43.205.94.73:8000/events \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"event_id\": \"b768e3a7-9eb3-4603-b21c-a54cc95661bc\",\n    \"event_type\": \"payment_initiated\",\n    \"transaction_id\": \"2f86e94c-239c-4302-9874-75f28e3474ee\",\n    \"merchant_id\": \"merchant_2\",\n    \"merchant_name\": \"FreshBasket\",\n    \"amount\": 15248.29,\n    \"currency\": \"INR\",\n    \"timestamp\": \"2026-01-08T12:11:58.085567+00:00\"\n  }'"
     },
     {
         "title": "2. List Transactions",
@@ -75,7 +75,7 @@ endpoints = [
                 "updated_at": "2026-01-08T12:38:58.085567+05:30"
             }
         ],
-        "curl": "curl -X GET \"http://localhost:8000/transactions?merchant_id=merchant_2&status=payment_failed&limit=2\""
+        "curl": "curl -X GET \"http://43.205.94.73:8000/transactions?merchant_id=merchant_2&status=payment_failed&limit=2\""
     },
     {
         "title": "3. Fetch Transaction Details",
@@ -116,7 +116,7 @@ endpoints = [
                 }
             ]
         },
-        "curl": "curl -X GET http://localhost:8000/transactions/2f86e94c-239c-4302-9874-75f28e3474ee"
+        "curl": "curl -X GET http://43.205.94.73:8000/transactions/2f86e94c-239c-4302-9874-75f28e3474ee"
     },
     {
         "title": "4. Reconciliation Summary",
@@ -154,7 +154,7 @@ endpoints = [
                 }
             ]
         },
-        "curl": "curl -X GET http://localhost:8000/reconciliation/summary"
+        "curl": "curl -X GET http://43.205.94.73:8000/reconciliation/summary"
     },
     {
         "title": "5. Reconciliation Discrepancies",
@@ -181,7 +181,7 @@ endpoints = [
                 "events": []
             }
         ],
-        "curl": "curl -X GET \"http://localhost:8000/reconciliation/discrepancies?limit=2\""
+        "curl": "curl -X GET \"http://43.205.94.73:8000/reconciliation/discrepancies?limit=2\""
     }
 ]
 
@@ -228,7 +228,7 @@ def generate_docx():
     
     # Base URL
     doc.add_heading("Base URL", level=2)
-    doc.add_paragraph("Local Server: http://localhost:8000")
+    doc.add_paragraph("Production Server: http://43.205.94.73:8000")
     
     doc.add_page_break()
     
@@ -417,7 +417,7 @@ def generate_pdf():
         body_style
     ))
     story.append(Paragraph("Base URL", h2_style))
-    story.append(Paragraph("Local Server: http://localhost:8000", body_style))
+    story.append(Paragraph("Production Server: http://43.205.94.73:8000", body_style))
     story.append(PageBreak())
     
     # API endpoints
