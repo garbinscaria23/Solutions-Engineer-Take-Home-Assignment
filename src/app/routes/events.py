@@ -5,7 +5,7 @@ from src.app import schemas, crud, db
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
-@router.post("", response_model=schemas.EventResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=schemas.EventResponse, status_code=status.HTTP_200_OK)
 def ingest_event(event: schemas.EventIngest, session: Session = Depends(db.get_db)):
     """
     Ingest a payment lifecycle event. Ingestion is idempotent based on event_id.

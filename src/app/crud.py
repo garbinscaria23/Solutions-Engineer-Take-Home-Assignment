@@ -8,6 +8,19 @@ from typing import List, Optional, Tuple
 from src.app import models, schemas
 from src.app.config import settings
 
+
+from datetime import timezone
+
+def normalize_timestamp(ts):
+    if ts is None:
+        return ts
+
+    # If timestamp has no timezone, assume UTC
+    if ts.tzinfo is None:
+        return ts.replace(tzinfo=timezone.utc)
+
+    return ts.astimezone(timezone.utc)
+
 def get_event(db: Session, event_id: str) -> Optional[models.Event]:
     return db.query(models.Event).filter(models.Event.event_id == event_id).first()
 
@@ -37,7 +50,11 @@ def reconcile_transaction_logic(
         return False, None
 
     # Sort events by timestamp to analyze sequential state changes
-    sorted_events = sorted(events, key=lambda e: e.timestamp)
+    # sorted_events = sorted(events, key=lambda e: e.timestamp)
+    sorted_events = sorted(
+        events,
+        key=lambda e: normalize_timestamp(e.timestamp)
+    )
     event_types = [e.event_type for e in sorted_events]
 
     # Check 1: Details mismatch (amount, currency, merchant ID must match across all events)
@@ -85,9 +102,8 @@ def reconcile_transaction_logic(
     if "payment_processed" in event_types and "settled" not in event_types and "payment_failed" not in event_types:
         processed_event = next(e for e in sorted_events if e.event_type == "payment_processed")
         now = datetime.datetime.now(datetime.timezone.utc)
-        ts = processed_event.timestamp
-        if ts.tzinfo is None:
-            now = now.replace(tzinfo=None)
+        ts = normalize_timestamp(processed_event.timestamp)
+
         elapsed = (now - ts).total_seconds() / 3600.0
         if elapsed > threshold_hours:
             return True, f"Payment marked processed but never settled (elapsed: {elapsed:.2f} hours)"
@@ -142,7 +158,11 @@ def ingest_single_event(db: Session, event_data: schemas.EventIngest) -> Tuple[m
     events = db.query(models.Event).filter(models.Event.transaction_id == transaction.id).all()
     
     # Update status to match the latest event by timestamp
-    latest_event = max(events, key=lambda e: e.timestamp)
+    # latest_event = max(events, key=lambda e: e.timestamp)
+    latest_event = max(
+    events,
+    key=lambda e: normalize_timestamp(e.timestamp)
+    )
     transaction.status = latest_event.event_type
     transaction.updated_at = latest_event.timestamp
 
@@ -356,7 +376,11 @@ def bulk_ingest_events(db: Session, events_data: List[schemas.EventIngest]) -> T
         tx_events = tx_events_map.get(tx_id, [])
         if tx_events:
             # Determine latest event by timestamp
-            latest_event = max(tx_events, key=lambda e: e.timestamp)
+            # latest_event = max(tx_events, key=lambda e: e.timestamp)
+            latest_event = max(
+                tx_events,
+                key=lambda e: normalize_timestamp(e.timestamp)
+            )
             tx.status = latest_event.event_type
             tx.updated_at = latest_event.timestamp
 
