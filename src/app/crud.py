@@ -85,7 +85,10 @@ def reconcile_transaction_logic(
     if "payment_processed" in event_types and "settled" not in event_types and "payment_failed" not in event_types:
         processed_event = next(e for e in sorted_events if e.event_type == "payment_processed")
         now = datetime.datetime.now(datetime.timezone.utc)
-        elapsed = (now - processed_event.timestamp).total_seconds() / 3600.0
+        ts = processed_event.timestamp
+        if ts.tzinfo is None:
+            now = now.replace(tzinfo=None)
+        elapsed = (now - ts).total_seconds() / 3600.0
         if elapsed > threshold_hours:
             return True, f"Payment marked processed but never settled (elapsed: {elapsed:.2f} hours)"
 
